@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPC with tagged subnets, Internet Gateway, and security groups
+Parameters:
+  DevVpcId:
+    Type: String
+    Description: The ID of the VPC where you want to create the EC2 instance
+    Default: vpc-02a4b3c8096aaeb6a
+
+  DevPubSubnetId:
+    Type: String
+    Description: The ID of an existing subnet
+    Default: subnet-0f4fced9d13a830e1
+
+  DevPubSecurityGroupId:
+    Type: String
+    Description: The ID of an existing security group
+    Default: sg-08f8d2f8b522304ef
+
+Resources:
+  MyTestEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Sub '{{resolve:ssm:/Infra/Build/infra_keypair}}'   # Replace with your key pair name
+      ImageId: !Sub '{{resolve:ssm:/Infra/Build/infra_ami}}'  # Replace with your desired AMI ID
+#      VpcId: !Ref DevVpcId
+      SubnetId: !Ref DevPubSubnetId
+      SecurityGroupIds: 
+        - !Ref DevPubSecurityGroupId
+      AvailabilityZone: us-east-1a
+#           - !GetAtt WebSecurityGroup.GroupId
+#          - !Sub '{{resolve:ssm:/Infra/Build/infra_keypair}}'
+      Tags:
+        - Key: Name
+          Value: WebEc2Test
+#      NetworkInterfaces:
+#        -
+#          AssociatePublicIpAddress: true
+#          DeviceIndex: '0'
+#          SubnetId: !Ref WebSubnet
